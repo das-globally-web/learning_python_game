@@ -1,13 +1,12 @@
 {
-    "randSeed": 58,
     "rowNum": 10,
     "colNum": 10,
-    "randomWallRemovalPercent": 15,
     "numItems": 7,
     "maxWeight": 5,
     "maxValue": 5,
     "knapsackCapacity": 15,
-    "knapsackSolver": "dynamic",
+    "knapsackSolver": "recur",
+    "pathFinder": "TaskB",
     "entrances": [
         [
             3,
@@ -20,10 +19,9 @@
             3
         ]
     ],
-    "pathFinder": "TaskC",
     "solverEntranceIndex": 0,
     "visualise": false,
     "mazeFromFile": false,
-    "mazeFileName": "sampleMaze01.txt",
+    "randomWallRemovalPercent": 15,
     "fileOutput": "testing"
 }

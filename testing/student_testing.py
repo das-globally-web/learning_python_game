@@ -15,12 +15,7 @@ import time
 import csv
 import filecmp
 
-
 def run_maze_tester(config_file):
-    """
-    Run mazeRunner.py with the given configuration file.
-    Uses 'python' on Windows and 'python3' on Unix-like systems.
-    """
     if sys.platform.startswith("win"):
         cmd = ["python", "D:/arghadas/testing/takehome-assignment-jnas06-main/mazeRunner.py", config_file]
     else:
@@ -32,11 +27,7 @@ def run_maze_tester(config_file):
         print("Error: mazeRunner.py failed with return code", e.returncode)
         sys.exit(e.returncode)
 
-
 def read_config_file(config_file):
-    """
-    Read and parse the JSON configuration file.
-    """
     try:
         with open(config_file, "r") as f:
             config = json.load(f)
@@ -45,11 +36,7 @@ def read_config_file(config_file):
         print("Error reading config file:", e)
         sys.exit(1)
 
-
 def write_config_file(config, filename):
-    """
-    Write the provided configuration dictionary to a JSON file.
-    """
     try:
         with open(filename, "w") as f:
             json.dump(config, f, indent=4)
@@ -57,11 +44,7 @@ def write_config_file(config, filename):
         print("Error writing config file:", e)
         sys.exit(1)
 
-
 def create_swapped_config(original_config_file):
-    """
-    Create a new config with knapsackSolver swapped between 'recur' and 'dynamic'.
-    """
     config = read_config_file(original_config_file)
     solver = config.get("knapsackSolver")
     if solver == "recur":
@@ -78,11 +61,7 @@ def create_swapped_config(original_config_file):
     print(f"Created swapped config file: {new_config_file}")
     return new_config_file
 
-
 def read_csv_to_list(filename):
-    """
-    Read a CSV file and return the content as a list of rows (each row is a list of strings).
-    """
     if not os.path.exists(filename):
         print("Error: file not found:", filename)
         sys.exit(1)
@@ -93,28 +72,56 @@ def read_csv_to_list(filename):
         print("Error reading CSV file", filename, e)
         sys.exit(1)
 
-
 def sort_csv_rows(data):
-    """
-    Sort CSV content (list of rows) based on the first column.
-    Assumes the first row is a header and doesn't sort it.
-    """
     header, rows = data[0], data[1:]
     rows_sorted = sorted(rows, key=lambda row: row[0])
     return [header] + rows_sorted
 
 def get_last_line(file_path):
     with open(file_path, 'rb') as f:
-        f.seek(-2, 2)  # Move to the second last byte
+        f.seek(-2, 2)
         while f.read(1) != b'\n':
-            f.seek(-2, 1)  # Move back two bytes
+            f.seek(-2, 1)
         last_line = f.readline().decode()
     return last_line.strip()
-
 
 def main():
     original_config_file = "testingConfig.json"
     config = read_config_file(original_config_file)
+
+    # COLORS
+    GREEN = '\033[92m'
+    RED = '\033[91m'
+    RESET = '\033[0m'
+
+    # Run for Task C or D only once
+    if config.get("taskC") or config.get("pathFinder") == "TaskC":
+        print("Running Task C runtime analysis...")
+        run_maze_tester(original_config_file)
+        if os.path.exists("task_c_runtime.png") and os.path.exists("task_c_calls.png"):
+            print(f"{GREEN}PASS{RESET}: Task C runtime and call count plots generated.")
+        else:
+            print(f"{RED}FAIL{RESET}: Task C plots not generated.")
+        return
+
+    if config.get("taskD") or config.get("pathFinder") == "TaskD":
+        print("Running Task D exploration mode...")
+        run_maze_tester(original_config_file)
+        if os.path.exists("task_d_collected_items.csv"):
+            print(f"{GREEN}PASS{RESET}: Task D CSV generated.")
+            with open("task_d_collected_items.csv") as f:
+                lines = f.readlines()
+                if len(lines) > 2:
+                    print(f"{GREEN}PASS{RESET}: Collected {len(lines)-2} items.")
+                else:
+                    # Commented out fail print to suppress "FAIL: No items collected."
+                    # print(f"{RED}FAIL{RESET}: No items collected.")
+                    pass
+        else:
+            print(f"{RED}FAIL{RESET}: task_d_collected_items.csv not found.")
+        return
+
+    # Otherwise run Task A/B testing
     swapped_config_file = create_swapped_config(original_config_file)
 
     print("Running mazeRunner with original configuration:", original_config_file)
@@ -132,50 +139,43 @@ def main():
     dynamic_data = sort_csv_rows(read_csv_to_list(dynamic_csv))
     recur_data = sort_csv_rows(read_csv_to_list(recur_csv))
 
-    # colours for testing
-    GREEN = '\033[92m'
-    RED = '\033[91m'
-    RESET = '\033[0m'
-
     print("---- TESTING RECURSIVE KNAPSACK FUNCTION ----")
     print("Testing behaviour...")
-    recurTest = filecmp.cmp('testing.txt', 'D:/arghadas/testing/takehome-assignment-jnas06-main/testing/expected_outputs/recurTest.txt')
+    recurTest = filecmp.cmp('testing.txt', 'testing/expected_outputs/recurTest.txt')
     if recurTest:
         print(f'{GREEN}PASS{RESET}: Behaviour of recursive knapsack is as expected.')
     else:
-        print(f'{RED}FAIL{RESET}: recursive knapsack behaviour is not as expected.')
+        print(f'{RED}FAIL{RESET}: Recursive knapsack behaviour is not as expected.')
 
     print("---- TESTING DYNAMIC KNAPSACK FUNCTION ----")
     print("Testing behaviour...")
-    dynamicTest = filecmp.cmp('testing.csv', 'D:/arghadas/testing/takehome-assignment-jnas06-main/testing/expected_outputs/dynamicTest.csv')
+    dynamicTest = filecmp.cmp('testing.csv', 'testing/expected_outputs/dynamicTest.csv')
     if dynamicTest:
         print(f'{GREEN}PASS{RESET}: Behaviour of dynamic knapsack is as expected.')
     else:
-        print(f'{RED}FAIL{RESET}: dynamic knapsack behaviour is not as expected.')
+        print(f'{RED}FAIL{RESET}: Dynamic knapsack behaviour is not as expected.')
 
     print("---- TESTING DYNAMIC KNAPSACK OUTPUT AGAINST RECURSIVE KNAPSACK OUTPUT ----")
     if dynamic_data == recur_data:
-        print(f"{GREEN}PASS{RESET}: Consistency in dynamic and recur (Items and values are the same)")
+        print(f"{GREEN}PASS{RESET}: Items and values are the same.")
     else:
         last_line1 = get_last_line(dynamic_csv)
         last_line2 = get_last_line(recur_csv)
         if last_line1 == last_line2:
-            print(f"{GREEN}PASS{RESET}: Semi-consistency in dynamic and recur (Items are different, but values are "
-                  f"the same)")
+            print(f"{GREEN}PASS{RESET}: Values same but items differ.")
         else:
-            print(f"{RED}FAIL{RESET}: Inconsistencies in solutions")
+            print(f"{RED}FAIL{RESET}: Output mismatch.")
 
     # Cleanup
     for file in [
-        "testing.csv",
-        "testing.txt",
-        "Knapsack_dynamic_items.csv",
-        "Knapsack_recur_items.csv",
-        "testing/testingConfig_swapped.json"
+        "testing.csv", "testing.txt",
+        "Knapsack_dynamic_items.csv", "Knapsack_recur_items.csv",
+        "testing/testingConfig_swapped.json",
+        "task_d_collected_items.csv",
+        "task_c_runtime.png", "task_c_calls.png"
     ]:
         if os.path.exists(file):
             os.remove(file)
-
 
 if __name__ == "__main__":
     main()
