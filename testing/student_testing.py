@@ -22,9 +22,9 @@ def run_maze_tester(config_file):
     Uses 'python' on Windows and 'python3' on Unix-like systems.
     """
     if sys.platform.startswith("win"):
-        cmd = ["python", "mazeRunner.py", config_file]
+        cmd = ["python", "D:/arghadas/testing/takehome-assignment-jnas06-main/mazeRunner.py", config_file]
     else:
-        cmd = ["python3", "mazeRunner.py", config_file]
+        cmd = ["python3", "D:/arghadas/testing/takehome-assignment-jnas06-main/mazeRunner.py", config_file]
 
     try:
         subprocess.run(cmd, check=True)
@@ -113,7 +113,7 @@ def get_last_line(file_path):
 
 
 def main():
-    original_config_file = "testing/testingConfig.json"
+    original_config_file = "testingConfig.json"
     config = read_config_file(original_config_file)
     swapped_config_file = create_swapped_config(original_config_file)
 
@@ -139,7 +139,7 @@ def main():
 
     print("---- TESTING RECURSIVE KNAPSACK FUNCTION ----")
     print("Testing behaviour...")
-    recurTest = filecmp.cmp('testing.txt', 'testing/expected_outputs/recurTest.txt')
+    recurTest = filecmp.cmp('testing.txt', 'D:/arghadas/testing/takehome-assignment-jnas06-main/testing/expected_outputs/recurTest.txt')
     if recurTest:
         print(f'{GREEN}PASS{RESET}: Behaviour of recursive knapsack is as expected.')
     else:
@@ -147,7 +147,7 @@ def main():
 
     print("---- TESTING DYNAMIC KNAPSACK FUNCTION ----")
     print("Testing behaviour...")
-    dynamicTest = filecmp.cmp('testing.csv', 'testing/expected_outputs/dynamicTest.csv')
+    dynamicTest = filecmp.cmp('testing.csv', 'D:/arghadas/testing/takehome-assignment-jnas06-main/testing/expected_outputs/dynamicTest.csv')
     if dynamicTest:
         print(f'{GREEN}PASS{RESET}: Behaviour of dynamic knapsack is as expected.')
     else:
